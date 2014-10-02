@@ -26,6 +26,60 @@ app.get('/', function(req, res) {
     res.sendFile(__dirname + '/index.html');
 });
 
+app.get('/test', function(req, res) {
+    var test = { '27': '0.0',
+  '93': '0.0',
+  '1605': '1494.0',
+  '1697': '1564.0',
+  '1909': '0.0',
+  '2411': '1672.0',
+  '2502': '1698.0',
+  '2713': '0.0',
+  '3217': '1789.0',
+  '3308': '1765.0',
+  '3521': '0.0',
+  '4026': '1673.0',
+  '4115': '1658.0',
+  '4216': '1680.0',
+  '4316': '1665.0',
+  '4417': '919.0',
+  '4631': '0.0',
+  '5332': '1755.0',
+  '5424': '1777.0',
+  '5526': '1771.0',
+  '5627': '1786.0',
+  '5727': '1807.0',
+  '5938': '0.0',
+  '6643': '1608.0',
+  '6732': '1687.0',
+  '6834': '519.0',
+  '7046': '0.0',
+  '7137': '1.0',
+  '7448': '1910.0',
+  '7540': '1891.0',
+  '7640': '1870.0',
+  '7740': '1902.0',
+  '7841': '2010.0',
+  '8053': '1.0',
+  '8646': '0.0',
+  '8858': '2099.0',
+  '9170': '1.0',
+  '9553': '2.0' };
+  var fileName = [generateUUID(),'.svg'].join('');
+    plot({
+      xlabel: 'timestamps',
+      ylabel: 'lux',
+      data: {'lux': test},
+      style: 'linespoints',
+      format: 'svg',
+      filename: 'public/graphs/' + fileName,
+      finish: function() {
+          io.sockets.emit('graph', {'graph_url': '/graph/' + fileName, result: 'test'});
+      }
+  });
+    res.sendStatus(200);
+});
+
 app.get('/graph/:name', function(req, res, next) {
     var options = {
         root: __dirname + '/public/graphs',
@@ -54,15 +108,13 @@ app.post('/graph', function(req, res) {
 
     var data = body.data;
     var result = body.result;
-    console.log(data);
-    console.log(result);
-    if (data && result) {
-        console.log(data);
-        var fileName = [generateUUID(),'_', result.toString(), '.svg'].join('');
+    var filtered = body.filteredData;
+    if (data != undefined && filtered != undefined && result != undefined) {
+        var fileName = [generateUUID(),'.svg'].join('');
         plot({
             xlabel: 'timestamps',
             ylabel: 'lux',
-            data: {'lux': data},
+            data: {'lux': data, 'filtered': filtered},
             style: 'linespoints',
             format: 'svg',
             filename: 'public/graphs/' + fileName,
