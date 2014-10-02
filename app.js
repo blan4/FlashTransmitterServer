@@ -7,8 +7,8 @@ var io = require('socket.io')(server);
 var bodyParser = require('body-parser');
 var plot = require('plotter').plot;
 
-app.use(bodyParser.json({ type: 'application/*+json' }));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 server.listen(3000);
 
@@ -49,8 +49,13 @@ app.get('/graph/:name', function(req, res, next) {
 });
 
 app.post('/graph', function(req, res) {
-    var data = JSON.parse(req.body.data);
-    var result = req.body.result;
+    console.log(req.body);
+    var body = JSON.parse(Object.keys(req.body)[0]);
+
+    var data = body.data;
+    var result = body.result;
+    console.log(data);
+    console.log(result);
     if (data && result) {
         console.log(data);
         var fileName = [generateUUID(),'_', result.toString(), '.svg'].join('');
@@ -67,7 +72,7 @@ app.post('/graph', function(req, res) {
         });
         res.sendStatus(200);
     } else {
-        res.sendStatus(400)
+        res.sendStatus(400);
     }
 });
 
